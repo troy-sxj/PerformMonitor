@@ -18,7 +18,7 @@ import com.mika.pm.android.core.PerformMonitor;
 public class PerformMonitorInstaller extends ContentProvider {
     @Override
     public boolean onCreate() {
-        PerformMonitor.init(getContext());
+//        PerformMonitor.init(getContext());
         return true;
     }
 

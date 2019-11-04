@@ -8,6 +8,7 @@ package com.mika.pm.android.memory.config;
 public class MemoryConfig {
 
     private boolean dumpHprof;
+    private long collectInterval = 5 * 60;    //内存信息采集间隔，单位second. 默认5min
 
     public boolean isDumpHprof() {
         return dumpHprof;
@@ -20,6 +21,11 @@ public class MemoryConfig {
 
         public Builder enableDumpHprof(boolean enable){
             config.dumpHprof = enable;
+            return this;
+        }
+
+        public Builder collectInterval(long second){
+            config.collectInterval = second;
             return this;
         }
 

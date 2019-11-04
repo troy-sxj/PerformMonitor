@@ -28,5 +28,5 @@ dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
 
-    implementation project(path: ':pm-android-core')
+    api project(path: ':pm-android-core')
 }

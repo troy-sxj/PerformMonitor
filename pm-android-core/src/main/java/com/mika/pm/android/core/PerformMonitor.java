@@ -19,11 +19,44 @@ public final class PerformMonitor {
     private final Application application;
     private final PluginListener pluginListener;
 
+    private static PerformMonitor sInstance;
+
 
     private PerformMonitor(Application application, HashSet<Plugin> plugins, PluginListener pluginListener) {
         this.plugins = plugins;
         this.application = application;
         this.pluginListener = pluginListener;
+        for (Plugin plugin : plugins) {
+            plugin.init(application, pluginListener);
+            pluginListener.onInit(plugin);
+        }
+    }
+
+    public static PerformMonitor init(PerformMonitor monitor) {
+        synchronized (PerformMonitor.class) {
+            if (sInstance == null) {
+                sInstance = monitor;
+            }
+        }
+        return sInstance;
+    }
+
+    public void startAllPlugins() {
+        for (Plugin plugin : plugins) {
+            plugin.start();
+        }
+    }
+
+    public void stopAllPlugins() {
+        for (Plugin plugin : plugins) {
+            plugin.stop();
+        }
+    }
+
+    public void destroyAllPlugins() {
+        for (Plugin plugin : plugins) {
+            plugin.destroy();
+        }
     }
 
     public static class Builder {
