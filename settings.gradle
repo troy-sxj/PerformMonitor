@@ -1,0 +1,2 @@
+include ':app', ':pm-android-core', ':pm-android-memory'
+rootProject.name='PerformMonitor'
