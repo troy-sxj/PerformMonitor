@@ -1,4 +1,4 @@
-package com.mika.pm.android.memory.entity;
+package com.mika.pm.android.memory.model;
 
 /**
  * @Author: mika

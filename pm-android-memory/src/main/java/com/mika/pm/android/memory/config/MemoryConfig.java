@@ -9,9 +9,18 @@ public class MemoryConfig {
 
     private boolean dumpHprof;
     private long collectInterval = 5 * 60;    //内存信息采集间隔，单位second. 默认5min
+    private int maxRedetectTimes;
 
     public boolean isDumpHprof() {
         return dumpHprof;
+    }
+
+    public long getCollectInterval() {
+        return collectInterval;
+    }
+
+    public int getMaxRedetectTimes() {
+        return maxRedetectTimes;
     }
 
     private MemoryConfig(){}

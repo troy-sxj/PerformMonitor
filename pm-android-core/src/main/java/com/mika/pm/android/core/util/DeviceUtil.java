@@ -57,6 +57,33 @@ public class DeviceUtil {
         return -1;
     }
 
+    public static long[] getVmLimit() {
+        String status = String.format("/proc/%s/limits", getPId());
+        long[] longs = new long[2];
+        try {
+            String content = getStringFromFile(status).trim();
+            String[] args = content.split("\n");
+            for (String str : args) {
+                if (str.startsWith("Max processes")) {
+                    Pattern p = Pattern.compile("\\d+");
+                    Matcher matcher = p.matcher(str);
+                    if (matcher.find()) {
+                        longs[0] = Long.parseLong(matcher.group());
+                    }
+                } else if (str.startsWith("Max open files")) {
+                    Pattern p = Pattern.compile("\\d+");
+                    Matcher matcher = p.matcher(str);
+                    if (matcher.find()) {
+                         longs[1] = Long.parseLong(matcher.group());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            return longs;
+        }
+        return longs;
+    }
+
     public static String convertStreamToString(InputStream is) throws Exception {
         BufferedReader reader = null;
         StringBuilder sb = new StringBuilder();

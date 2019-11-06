@@ -35,7 +35,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void testJcmd(){
-        String s = ShellUtil.execCmd("jcmd -heap " + DeviceUtil.getPId());
-        Log.e("sxj", s);
+//        String s = ShellUtil.execCmd("jcmd -heap " + DeviceUtil.getPId());
+//        Log.e("sxj", s);
+
+        long[] vmLimit = DeviceUtil.getVmLimit();
+        Log.e("sxj", vmLimit[0] + ", " + vmLimit[1]);
     }
 }
