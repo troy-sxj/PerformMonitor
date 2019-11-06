@@ -6,10 +6,12 @@ import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.core.app.JobIntentService;
 
+import com.mika.pm.android.memory.hproflib.HprofBufferShrinker;
 import com.mika.pm.android.memory.model.HeapDump;
 import com.mika.pm.android.memory.watcher.DumpStorageManager;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -53,7 +55,12 @@ public class CanaryWorkService extends JobIntentService {
         final File hprofFile = heapDump.getHprofFile();
         ZipOutputStream zof =null;
 
-        long startTime = System.currentTimeMillis();
+        try {
+            long startTime = System.currentTimeMillis();
+            new HprofBufferShrinker().shrink(hprofFile, shrinkedHprofFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private String getShrinkHprofName(File originHprof) {

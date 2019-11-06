@@ -14,7 +14,7 @@ public class ID {
 
     private final byte[] mIdBytes;
 
-    public static ID createNullId(int size){
+    public static ID createNullID(int size){
         return new ID(new byte[size]);
     }
 
