@@ -50,7 +50,7 @@ public abstract class Plugin implements IPlugin {
         if(pluginListener == null){
             throw new RuntimeException("Plugin destroy, plugin listener is null");
         }
-        pluginListener.onDestory(this);
+        pluginListener.onDestroy(this);
     }
 
     @Override

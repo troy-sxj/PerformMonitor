@@ -15,7 +15,7 @@ public interface PluginListener {
 
     void onStop(Plugin plugin);
 
-    void onDestory(Plugin plugin);
+    void onDestroy(Plugin plugin);
 
     void onReportIssue(Issue issue);
 }

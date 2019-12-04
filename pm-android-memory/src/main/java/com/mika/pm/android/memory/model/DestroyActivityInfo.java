@@ -2,6 +2,8 @@ package com.mika.pm.android.memory.model;
 
 import android.app.Activity;
 
+import androidx.annotation.Nullable;
+
 import java.lang.ref.WeakReference;
 
 /**
@@ -23,5 +25,13 @@ public class DestroyActivityInfo {
         this.mActivityName = activityName;
         this.mActivityRef = new WeakReference<>(activity);
         this.mLastCreatedActivityCount = mLastCreatedActivityCount;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if(obj instanceof DestroyActivityInfo){
+            return ((DestroyActivityInfo) obj).mKey.equals(this.mKey);
+        }
+        return super.equals(obj);
     }
 }

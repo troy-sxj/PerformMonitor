@@ -21,9 +21,9 @@ public class HprofHeapDumpVisitor {
         }
     }
 
-    public void visitHeapDumpBasicObj(int tag, ID id) {
+    public void visitHeapDumpBasicObj(int tag, String tagInfo, ID id) {
         if (this.hdv != null) {
-            this.hdv.visitHeapDumpBasicObj(tag, id);
+            this.hdv.visitHeapDumpBasicObj(tag, tagInfo, id);
         }
     }
 

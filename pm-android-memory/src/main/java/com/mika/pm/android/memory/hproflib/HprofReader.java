@@ -1,5 +1,6 @@
 package com.mika.pm.android.memory.hproflib;
 
+import com.mika.pm.android.core.util.PMLog;
 import com.mika.pm.android.memory.hproflib.model.Field;
 import com.mika.pm.android.memory.hproflib.model.ID;
 import com.mika.pm.android.memory.hproflib.model.Type;
@@ -15,6 +16,8 @@ import java.io.InputStream;
  * @Description:
  */
 public class HprofReader {
+
+    private static final String TAG = "HprofReader";
     private final InputStream mStreamIn;
     private int mIdSize = 0;
 
@@ -29,6 +32,7 @@ public class HprofReader {
     }
 
     private void acceptHeader(HprofVisitor hv) throws IOException {
+        //读取版本信息
         final String text = IOUtil.readNullTerminatedString(mStreamIn);
         final int idSize = IOUtil.readBEInt(mStreamIn);
         if (idSize <= 0 || idSize >= (Integer.MAX_VALUE >> 1)) {
@@ -46,16 +50,16 @@ public class HprofReader {
                 final int timestamp = IOUtil.readBEInt(mStreamIn);
                 final long length = IOUtil.readBEInt(mStreamIn) & 0x00000000FFFFFFFFL;
                 switch (tag) {
-                    case HprofConstants.RECORD_TAG_STRING:
+                    case HprofConstants.RECORD_TAG_STRING:  //string
                         acceptStringRecord(timestamp, length, hv);
                         break;
-                    case HprofConstants.RECORD_TAG_LOAD_CLASS:
+                    case HprofConstants.RECORD_TAG_LOAD_CLASS:  //已加载的class
                         acceptLoadClassRecord(timestamp, length, hv);
                         break;
-                    case HprofConstants.RECORD_TAG_STACK_FRAME:
+                    case HprofConstants.RECORD_TAG_STACK_FRAME: //包含所有线程的栈帧信息
                         acceptStackFrameRecord(timestamp, length, hv);
                         break;
-                    case HprofConstants.RECORD_TAG_STACK_TRACE:
+                    case HprofConstants.RECORD_TAG_STACK_TRACE: //包含所有线程的虚拟机栈情况
                         acceptStackTraceRecord(timestamp, length, hv);
                         break;
                     case HprofConstants.RECORD_TAG_HEAP_DUMP:
@@ -64,8 +68,12 @@ public class HprofReader {
                         break;
                     case HprofConstants.RECORD_TAG_ALLOC_SITES:
                     case HprofConstants.RECORD_TAG_HEAP_SUMMARY:
+                        acceptHeapSummary(timestamp, length, hv);
                     case HprofConstants.RECORD_TAG_START_THREAD:
+                        PMLog.e(TAG, "RECORD_TAG_START_THREAD");
+                        acceptThreadStart(timestamp, length, hv);
                     case HprofConstants.RECORD_TAG_END_THREAD:
+                        acceptThreadEnd(timestamp, length, hv);
                     case HprofConstants.RECORD_TAG_HEAP_DUMP_END:
                     case HprofConstants.RECORD_TAG_CPU_SAMPLES:
                     case HprofConstants.RECORD_TAG_CONTROL_SETTINGS:
@@ -79,6 +87,30 @@ public class HprofReader {
         } catch (EOFException ignored) {
             // Ignored.
         }
+    }
+
+    private void acceptThreadStart(int timestamp, long length, HprofVisitor hv) throws IOException{
+        final int serialNumber = IOUtil.readBEInt(mStreamIn);
+        final ID threadObjId = IOUtil.readID(mStreamIn, mIdSize);
+        final int stacktraceSerial = IOUtil.readBEInt(mStreamIn);
+        final ID threadNameStrId = IOUtil.readID(mStreamIn, mIdSize);
+        final ID threadGroupNameId = IOUtil.readID(mStreamIn, mIdSize);
+        final ID threadParentGroupNameId = IOUtil.readID(mStreamIn, mIdSize);
+        hv.visitThreadStartRecord(serialNumber, threadObjId, stacktraceSerial, threadNameStrId, threadGroupNameId, threadParentGroupNameId);
+    }
+
+    private void acceptThreadEnd(int timestamp, long length, HprofVisitor hv) throws IOException{
+        final int serialNumber = IOUtil.readBEInt(mStreamIn);
+        hv.visitThreadEnd(serialNumber);
+    }
+
+    private void acceptHeapSummary(int timestamp, long length, HprofVisitor hv) throws IOException {
+        final int totalLiveBytes = IOUtil.readBEInt(mStreamIn);
+        final int totalLiveInstances = IOUtil.readBEInt(mStreamIn);
+        final long totalBytesAllocated = IOUtil.readBELong(mStreamIn);
+        final long totalInstancesAllocated = IOUtil.readBELong(mStreamIn);
+        PMLog.e(TAG, "acceptHeapSummary === live bytes: %d, live instances: %d, bytes allocated: %l, instances allocated: %l",
+                totalLiveBytes, totalLiveInstances, totalBytesAllocated, totalInstancesAllocated);
     }
 
     private void acceptStringRecord(int timestamp, long length, HprofVisitor hv) throws IOException {
@@ -127,11 +159,11 @@ public class HprofReader {
             --length;
             switch (heapDumpTag) {
                 case HprofConstants.HEAPDUMP_ROOT_UNKNOWN:
-                    hdv.visitHeapDumpBasicObj(heapDumpTag, IOUtil.readID(mStreamIn, mIdSize));
+                    hdv.visitHeapDumpBasicObj(heapDumpTag, "ROOT_UNKNOWN", IOUtil.readID(mStreamIn, mIdSize));
                     length -= mIdSize;
                     break;
                 case HprofConstants.HEAPDUMP_ROOT_JNI_GLOBAL:
-                    hdv.visitHeapDumpBasicObj(heapDumpTag, IOUtil.readID(mStreamIn, mIdSize));
+                    hdv.visitHeapDumpBasicObj(heapDumpTag, "ROOT_JNI_GLOBAL", IOUtil.readID(mStreamIn, mIdSize));
                     IOUtil.skip(mStreamIn, mIdSize);   //  ignored
                     length -= (mIdSize << 1);
                     break;
@@ -145,19 +177,21 @@ public class HprofReader {
                     length -= acceptNativeStack(hdv);
                     break;
                 case HprofConstants.HEAPDUMP_ROOT_STICKY_CLASS:
-                    hdv.visitHeapDumpBasicObj(heapDumpTag, IOUtil.readID(mStreamIn, mIdSize));
+                    hdv.visitHeapDumpBasicObj(heapDumpTag, "ROOT_STICKY_CLASS", IOUtil.readID(mStreamIn, mIdSize));
                     length -= mIdSize;
                     break;
                 case HprofConstants.HEAPDUMP_ROOT_THREAD_BLOCK:
                     length -= acceptThreadBlock(hdv);
                     break;
                 case HprofConstants.HEAPDUMP_ROOT_MONITOR_USED:
-                    hdv.visitHeapDumpBasicObj(heapDumpTag, IOUtil.readID(mStreamIn, mIdSize));
+                    hdv.visitHeapDumpBasicObj(heapDumpTag, "ROOT_MONITOR_USED", IOUtil.readID(mStreamIn, mIdSize));
                     length -= mIdSize;
                     break;
                 case HprofConstants.HEAPDUMP_ROOT_THREAD_OBJECT:
                     length -= acceptThreadObject(hdv);
                     break;
+
+
                 case HprofConstants.HEAPDUMP_ROOT_CLASS_DUMP:
                     length -= acceptClassDump(hdv);
                     break;
@@ -170,6 +204,8 @@ public class HprofReader {
                 case HprofConstants.HEAPDUMP_ROOT_PRIMITIVE_ARRAY_DUMP:
                     length -= acceptPrimitiveArrayDump(heapDumpTag, hdv);
                     break;
+
+
                 case HprofConstants.HEAPDUMP_ROOT_PRIMITIVE_ARRAY_NODATA_DUMP:
                     length -= acceptPrimitiveArrayDump(heapDumpTag, hdv);
                     break;
@@ -177,30 +213,30 @@ public class HprofReader {
                     length -= acceptHeapDumpInfo(hdv);
                     break;
                 case HprofConstants.HEAPDUMP_ROOT_INTERNED_STRING:
-                    hdv.visitHeapDumpBasicObj(heapDumpTag, IOUtil.readID(mStreamIn, mIdSize));
+                    hdv.visitHeapDumpBasicObj(heapDumpTag, "ROOT_INTERNED_STRING", IOUtil.readID(mStreamIn, mIdSize));
                     length -= mIdSize;
                     break;
                 case HprofConstants.HEAPDUMP_ROOT_FINALIZING:
-                    hdv.visitHeapDumpBasicObj(heapDumpTag, IOUtil.readID(mStreamIn, mIdSize));
+                    hdv.visitHeapDumpBasicObj(heapDumpTag, "ROOT_FINALIZING", IOUtil.readID(mStreamIn, mIdSize));
                     length -= mIdSize;
                     break;
                 case HprofConstants.HEAPDUMP_ROOT_DEBUGGER:
-                    hdv.visitHeapDumpBasicObj(heapDumpTag, IOUtil.readID(mStreamIn, mIdSize));
+                    hdv.visitHeapDumpBasicObj(heapDumpTag, "ROOT_DEBUGGER", IOUtil.readID(mStreamIn, mIdSize));
                     length -= mIdSize;
                     break;
                 case HprofConstants.HEAPDUMP_ROOT_REFERENCE_CLEANUP:
-                    hdv.visitHeapDumpBasicObj(heapDumpTag, IOUtil.readID(mStreamIn, mIdSize));
+                    hdv.visitHeapDumpBasicObj(heapDumpTag, "ROOT_REFERENCE_CLEANUP", IOUtil.readID(mStreamIn, mIdSize));
                     length -= mIdSize;
                     break;
                 case HprofConstants.HEAPDUMP_ROOT_VM_INTERNAL:
-                    hdv.visitHeapDumpBasicObj(heapDumpTag, IOUtil.readID(mStreamIn, mIdSize));
+                    hdv.visitHeapDumpBasicObj(heapDumpTag, "ROOT_VM_INTERNAL", IOUtil.readID(mStreamIn, mIdSize));
                     length -= mIdSize;
                     break;
                 case HprofConstants.HEAPDUMP_ROOT_JNI_MONITOR:
                     length -= acceptJniMonitor(hdv);
                     break;
                 case HprofConstants.HEAPDUMP_ROOT_UNREACHABLE:
-                    hdv.visitHeapDumpBasicObj(heapDumpTag, IOUtil.readID(mStreamIn, mIdSize));
+                    hdv.visitHeapDumpBasicObj(heapDumpTag, "ROOT_UNREACHABLE", IOUtil.readID(mStreamIn, mIdSize));
                     length -= mIdSize;
                     break;
                 default:
@@ -238,6 +274,7 @@ public class HprofReader {
         final ID id = IOUtil.readID(mStreamIn, mIdSize);
         final int threadSerialNumber = IOUtil.readBEInt(mStreamIn);
         final int stackFrameNumber = IOUtil.readBEInt(mStreamIn);
+//        PMLog.e(TAG, "ROOT JAVA FRAME === threadSerialNum: %d, stackFrameNum: %d", threadSerialNumber, stackFrameNumber);
         hdv.visitHeapDumpJavaFrame(id, threadSerialNumber, stackFrameNumber);
         return mIdSize + 4 + 4;
     }
@@ -260,6 +297,7 @@ public class HprofReader {
         final ID id = IOUtil.readID(mStreamIn, mIdSize);
         final int threadSerialNumber = IOUtil.readBEInt(mStreamIn);
         final int stackFrameNumber = IOUtil.readBEInt(mStreamIn);
+//        PMLog.e(TAG, "ROOT THREAD OBJECT === id: %s, thread serialNum: %d, stack frame num: %d", id.toString(), threadSerialNumber, stackFrameNumber);
         hdv.visitHeapDumpThreadObject(id, threadSerialNumber, stackFrameNumber);
         return mIdSize + 4 + 4;
     }
@@ -269,7 +307,9 @@ public class HprofReader {
         final int stackSerialNumber = IOUtil.readBEInt(mStreamIn);
         final ID superClassId = IOUtil.readID(mStreamIn, mIdSize);
         final ID classLoaderId = IOUtil.readID(mStreamIn, mIdSize);
+        //左移两位，跳过 signers object ID, protection domain object ID, reserved ID, reserved ID
         IOUtil.skip(mStreamIn, (mIdSize << 2));
+
         final int instanceSize = IOUtil.readBEInt(mStreamIn);
 
         int bytesRead = (7 * mIdSize) + 4 + 4;

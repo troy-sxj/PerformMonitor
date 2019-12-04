@@ -1,10 +1,13 @@
 package com.mika.perform;
 
 import android.app.Application;
+import android.view.View;
 
 import com.mika.pm.android.core.PerformMonitor;
 import com.mika.pm.android.memory.MemoryPlugin;
 import com.mika.pm.android.memory.config.MemoryConfig;
+
+import java.util.ArrayList;
 
 /**
  * @Author: mika
@@ -12,6 +15,8 @@ import com.mika.pm.android.memory.config.MemoryConfig;
  * @Description:
  */
 public class App extends Application {
+
+    public ArrayList<View> mLeakedViews = new ArrayList<>();
 
     @Override
     public void onCreate() {
@@ -23,8 +28,7 @@ public class App extends Application {
 
         PerformMonitor.Builder builder = new PerformMonitor.Builder(this).plugin(memoryPlugin);
 
-        PerformMonitor.init(builder.build())
-                .startAllPlugins();
+        PerformMonitor.init(builder.build());
 
     }
 }

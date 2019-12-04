@@ -1,11 +1,17 @@
 package com.mika.pm.android.memory;
 
+import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
+import android.os.Debug;
+import android.os.Process;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.JobIntentService;
 
+import com.mika.pm.android.core.util.PMLog;
 import com.mika.pm.android.memory.hproflib.HprofBufferShrinker;
 import com.mika.pm.android.memory.model.HeapDump;
 import com.mika.pm.android.memory.watcher.DumpStorageManager;
@@ -22,29 +28,42 @@ import java.util.zip.ZipOutputStream;
  * @Time: 2019-11-05 15:43
  * @Description:
  */
-public class CanaryWorkService extends JobIntentService {
+public class CanaryWorkService extends IntentService {
 
-    private static final int JOB_ID = 0xFAFBFCFD;
-
-    private static final String ACTION_SHRINK_HPROF = "com.mika.pm.android.memory.work.SHRINK_HPROF";
+    private static final String TAG = "CanaryWorkService";
     private static final String EXTRA_PARAM_HEAP_DUMP = "com.mika.pm.android.memory.work.HEAP_DUMP";
 
-    public static void shrinkHprofAndReport(Context context, HeapDump heapDump) {
-        final Intent intent = new Intent(context, CanaryWorkService.class);
-        intent.setAction(ACTION_SHRINK_HPROF);
-        intent.putExtra(EXTRA_PARAM_HEAP_DUMP, heapDump);
-        enqueueWork(context, CanaryWorkService.class, JOB_ID, intent);
+    public CanaryWorkService() {
+        super(CanaryWorkService.class.getSimpleName());
     }
 
     @Override
-    protected void onHandleWork(@NonNull Intent intent) {
-        final String action = intent.getAction();
-        if (ACTION_SHRINK_HPROF.equals(action)) {
-            intent.setExtrasClassLoader(this.getClassLoader());
-            HeapDump heapDump = (HeapDump) intent.getSerializableExtra(EXTRA_PARAM_HEAP_DUMP);
-            if (heapDump != null) {
-                doShrinkHprof(heapDump);
-            }
+    public void onCreate() {
+        super.onCreate();
+    }
+
+    @Override
+    public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
+        return START_NOT_STICKY;
+    }
+
+    public static void shrinkHprofAndReport(Context context, HeapDump heapDump) {
+        final Intent intent = new Intent(context, CanaryWorkService.class);
+        intent.putExtra(EXTRA_PARAM_HEAP_DUMP, heapDump);
+        if(Build.VERSION.SDK_INT >= 26){
+            context.startForegroundService(intent);
+        }else{
+            context.startService(intent);
+        }
+    }
+
+    @Override
+    protected void onHandleIntent(@Nullable Intent intent) {
+        PMLog.d(TAG, "work thread is %s", Thread.currentThread().getName());
+        HeapDump heapDump = (HeapDump) intent.getSerializableExtra(EXTRA_PARAM_HEAP_DUMP);
+        if (heapDump != null) {
+            doShrinkHprof(heapDump);
         }
     }
 

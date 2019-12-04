@@ -12,4 +12,17 @@
         android:layout_height="wrap_content"
         android:text="jcmd" />
 
+    <Button
+        android:id="@+id/btn_jump"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Jump Leak Activity" />
+
+    <Button
+        android:id="@+id/btn_dump"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Dump Analyze" />
+
+
 </LinearLayout>

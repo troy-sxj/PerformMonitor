@@ -45,6 +45,18 @@ public class HprofVisitor {
         }
     }
 
+    public void visitThreadStartRecord(int threadSerialNumber, ID threadId, int stackTraceSerial, ID threadStrNameId, ID threadGroupNameId, ID threadParentGroupNameId){
+        if(this.hv != null){
+            this.hv.visitThreadStartRecord(threadSerialNumber, threadId, stackTraceSerial, threadStrNameId, threadGroupNameId, threadParentGroupNameId);
+        }
+    }
+
+    public void visitThreadEnd(int threadSerialNumber){
+        if(this.hv != null){
+            this.hv.visitThreadEnd(threadSerialNumber);
+        }
+    }
+
     public HprofHeapDumpVisitor visitHeapDumpRecord(int tag, int timestamp, long length) {
         if (this.hv != null) {
             return this.hv.visitHeapDumpRecord(tag, timestamp, length);

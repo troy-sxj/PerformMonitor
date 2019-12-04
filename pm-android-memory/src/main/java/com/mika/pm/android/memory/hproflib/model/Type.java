@@ -57,7 +57,7 @@ public enum  Type {
             case SHORT: return "short[]";
             case INT: return "int[]";
             case LONG: return "long[]";
-            default: throw new IllegalArgumentException("OBJECT type is not a primitive type");
+            default: return "Object";
         }
     }
 

@@ -86,6 +86,11 @@ public class HprofBufferShrinker {
 
             final HprofReader reader = new HprofReader(new BufferedInputStream(is));
             reader.accept(new HprofInfoCollectVisitor());
+
+            //转换后的hprof写本地
+            is.getChannel().position(0);
+            reader.accept(new HprofTransformWriter());
+
             // Reset.
             is.getChannel().position(0);
             reader.accept(new HprofKeptBufferCollectVisitor());

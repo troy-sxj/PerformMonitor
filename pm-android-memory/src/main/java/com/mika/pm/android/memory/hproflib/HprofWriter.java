@@ -156,7 +156,7 @@ public class HprofWriter extends HprofVisitor {
         }
 
         @Override
-        public void visitHeapDumpBasicObj(int tag, ID id) {
+        public void visitHeapDumpBasicObj(int tag, String tagInfo, ID id) {
             try {
                 mHeapDumpOut.write(tag);
                 mHeapDumpOut.write(id.getBytes());

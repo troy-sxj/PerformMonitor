@@ -101,17 +101,13 @@ public class ActivityRefWatcher implements Watcher {
 
         mDestroyActivityInfos = new ConcurrentLinkedDeque<>();
         mCurrentCreatedActivityCount = new AtomicLong(0);
+
+        memoryPlugin.getApplication().registerActivityLifecycleCallbacks(mRemovedActivityMonitor);
     }
 
 
     @Override
     public void start() {
-        final Application app = memoryPlugin.getApplication();
-        if (app != null) {
-            app.registerActivityLifecycleCallbacks(mRemovedActivityMonitor);
-//            scheduleDetectProcedure();
-        }
-
         //TODO for test
         if (mAndroidHeapDumper != null) {
             File hprofFile = mAndroidHeapDumper.dumpHeap();

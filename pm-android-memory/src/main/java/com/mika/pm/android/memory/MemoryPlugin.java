@@ -34,7 +34,7 @@ public class MemoryPlugin extends Plugin {
         PMLog.i(TAG, "Memory Plugin init, config %s", mConfig.toString());
 
         mWatcher = new ActivityRefWatcher(application, this);
-        memoryTracer = new MemoryTracer();
+//        memoryTracer = new MemoryTracer();
     }
 
     @Override

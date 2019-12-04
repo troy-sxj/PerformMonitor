@@ -33,7 +33,7 @@ public class DefaultPluginListener implements PluginListener {
     }
 
     @Override
-    public void onDestory(Plugin plugin) {
+    public void onDestroy(Plugin plugin) {
 
     }
 

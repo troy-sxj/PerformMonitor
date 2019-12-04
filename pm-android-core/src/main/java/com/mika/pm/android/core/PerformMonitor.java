@@ -41,6 +41,13 @@ public final class PerformMonitor {
         return sInstance;
     }
 
+    public static PerformMonitor getInstance(){
+        if(sInstance == null){
+            throw new RuntimeException("PerformMonitor must be init first");
+        }
+        return sInstance;
+    }
+
     public void startAllPlugins() {
         for (Plugin plugin : plugins) {
             plugin.start();
