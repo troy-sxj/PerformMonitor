@@ -94,7 +94,6 @@ public class MemoryTracer {
 
             if(overloadTimes == 0){
                 //连续三次内存占用超过阀值，
-
                 overloadTimes = 3;
             }
         }

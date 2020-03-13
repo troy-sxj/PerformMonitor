@@ -61,9 +61,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void testDump() {
-//        for(int i =0; i< 1000; i++){
-//            models.add(new LargeModel());
-//        }
-        PerformMonitor.getInstance().startAllPlugins();
+        for(int i =0; i< 1000; i++){
+            models.add(new LargeModel());
+        }
+//        PerformMonitor.getInstance().startAllPlugins();
     }
 }

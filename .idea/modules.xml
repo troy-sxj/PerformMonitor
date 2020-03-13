@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/PerformMonitor.iml" filepath="$PROJECT_DIR$/PerformMonitor.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/pm-android-core/pm-android-core.iml" filepath="$PROJECT_DIR$/pm-android-core/pm-android-core.iml" />
-      <module fileurl="file://$PROJECT_DIR$/pm-android-memory/pm-android-memory.iml" filepath="$PROJECT_DIR$/pm-android-memory/pm-android-memory.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PerformMonitor.iml" filepath="$PROJECT_DIR$/PerformMonitor.iml" group="PerformMonitor" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="PerformMonitor/app" />
+      <module fileurl="file://$PROJECT_DIR$/pm-android-core/pm-android-core.iml" filepath="$PROJECT_DIR$/pm-android-core/pm-android-core.iml" group="PerformMonitor/pm-android-core" />
+      <module fileurl="file://$PROJECT_DIR$/pm-android-memory/pm-android-memory.iml" filepath="$PROJECT_DIR$/pm-android-memory/pm-android-memory.iml" group="PerformMonitor/pm-android-memory" />
     </modules>
   </component>
 </project>
