@@ -8,6 +8,7 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.mika.perform.argusa.main.core.job.fps.FpsTask;
 import com.mika.pm.android.core.PerformMonitor;
 import com.mika.pm.android.core.util.DeviceUtil;
 
@@ -40,7 +41,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_jcmd:
-                testJcmd();
+                new FpsTask().start();
+//                testJcmd();
                 break;
             case R.id.btn_dump:
                 testDump();

@@ -2,10 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/PerformMonitor.iml" filepath="$PROJECT_DIR$/PerformMonitor.iml" group="PerformMonitor" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="PerformMonitor/app" />
-      <module fileurl="file://$PROJECT_DIR$/pm-android-core/pm-android-core.iml" filepath="$PROJECT_DIR$/pm-android-core/pm-android-core.iml" group="PerformMonitor/pm-android-core" />
-      <module fileurl="file://$PROJECT_DIR$/pm-android-memory/pm-android-memory.iml" filepath="$PROJECT_DIR$/pm-android-memory/pm-android-memory.iml" group="PerformMonitor/pm-android-memory" />
+      <module fileurl="file://$PROJECT_DIR$/PerformMonitor.iml" filepath="$PROJECT_DIR$/PerformMonitor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/PerformMonitor.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/PerformMonitor.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/pm-android-core/PerformMonitor.pm-android-core.iml" filepath="$PROJECT_DIR$/.idea/modules/pm-android-core/PerformMonitor.pm-android-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/pm-android-memory/PerformMonitor.pm-android-memory.iml" filepath="$PROJECT_DIR$/.idea/modules/pm-android-memory/PerformMonitor.pm-android-memory.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/pm-aop/PerformMonitor.pm-aop.iml" filepath="$PROJECT_DIR$/.idea/modules/pm-aop/PerformMonitor.pm-aop.iml" />
     </modules>
   </component>
 </project>
